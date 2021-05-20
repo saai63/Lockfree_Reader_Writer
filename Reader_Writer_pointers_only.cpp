@@ -84,11 +84,11 @@ public:
 
    void update(const std::string &str, uint32_t &num)
    {
-      //m_mutex.lock();
+      m_mutex.lock();
       auto writePtr = std::make_shared<Config>(*m_readPtr); // Create a temporary copy
       writePtr->update(str, num);
       std::atomic_exchange(&m_readPtr, writePtr); // Both readPtr and writePtr now point to the heap object of writePtr
-      //m_mutex.unlock();
+      m_mutex.unlock();
    }
 
    read_result read()
