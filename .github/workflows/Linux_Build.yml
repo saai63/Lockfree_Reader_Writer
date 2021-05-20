@@ -1,0 +1,40 @@
+name: Linux_Build
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: ${{ matrix.config.name }}
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+        - {
+            name: "Ubuntu Latest - GCC", artifact: "linux-gcc.tar.xz",
+            os: ubuntu-latest,
+            cc: "gcc-9", cxx: "g++-9"
+          }
+        - {
+            name: "Ubuntu Latest - Clang", artifact: "linux-clang.tar.xz",
+            os: ubuntu-latest,
+            cc: "clang-9", cxx: "clang++-9"
+          }
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: "recursive"
+
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: sudo apt-get install cmake;
+      
+      - name: Build
+        run : mkdir build; cd build; cmake ..; make;
+
+      - name: Test Reader_Writer_pointer_globalObj
+        run : ./build/Reader_Writer_pointer_globalObj
+      
+      - name: Test Reader_Writer_pointers_only 
+        run : ./build/Reader_Writer_pointers_only

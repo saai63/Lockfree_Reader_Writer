@@ -35,7 +35,7 @@ public:
    {
    }
 
-   Config(const Config& other) : m_str(other.m_str), m_u32(other.m_u32)
+   Config(const Config &other) : m_str(other.m_str), m_u32(other.m_u32)
    {
    }
 
@@ -69,7 +69,7 @@ private:
    /* Hide the C-tor */
    ConfigReader()
    {
-      m_readPtr = std::make_shared<Config> ("0", 0);
+      m_readPtr = std::make_shared<Config>("0", 0);
    }
    std::shared_ptr<Config> m_readPtr;
    std::mutex m_mutex;
@@ -84,11 +84,11 @@ public:
 
    void update(const std::string &str, uint32_t &num)
    {
-      m_mutex.lock();
-      auto writePtr = std::make_shared<Config>(*m_readPtr);  // Create a temporary copy
+      //m_mutex.lock();
+      auto writePtr = std::make_shared<Config>(*m_readPtr); // Create a temporary copy
       writePtr->update(str, num);
-      std::atomic_exchange(&m_readPtr, writePtr);       // Both readPtr and writePtr now point to the heap object of writePtr
-      m_mutex.unlock();
+      std::atomic_exchange(&m_readPtr, writePtr); // Both readPtr and writePtr now point to the heap object of writePtr
+      //m_mutex.unlock();
    }
 
    read_result read()
@@ -132,7 +132,7 @@ void writer()
 int main()
 {
    std::vector<std::thread> readers;
-   for (int n = 0; n < 15; n++)
+   for (int n = 0; n < 20; n++)
    {
       readers.emplace_back(reader);
    }

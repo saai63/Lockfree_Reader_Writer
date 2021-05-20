@@ -8,7 +8,8 @@
 
 /* struct to model a tuple returned by read()
  *  Provides an utility to check the validity*/
-typedef struct read_result_def {
+typedef struct read_result_def
+{
    std::string _str;
    uint32_t _u32;
 
@@ -18,29 +19,30 @@ typedef struct read_result_def {
    {
       return (std::to_string(_u32) == _str);
    }
-}read_result;
+} read_result;
 
 /* This models the nlohmann_json object. 
   * Doesn't have any kind of locks internally 
   * Simulates lookup times via sleep  */
-class Config {
+class Config
+{
 private:
    std::string m_str;
    uint32_t m_u32;
 
 public:
-   Config(const std::string& str, uint32_t num) : m_str(str), m_u32(num)
+   Config(const std::string &str, uint32_t num) : m_str(str), m_u32(num)
    {
    }
 
-   Config& operator=(Config& src)
+   Config &operator=(Config &src)
    {
-	   m_str = src.m_str;
-	   m_u32 = src.m_u32;
-	   return *this;
+      m_str = src.m_str;
+      m_u32 = src.m_u32;
+      return *this;
    }
 
-   void update(const std::string& str, uint32_t& num)
+   void update(const std::string &str, uint32_t &num)
    {
       m_str = str;
       std::this_thread::sleep_for(std::chrono::milliseconds(3)); // This sleep simulates long search times if any
@@ -57,7 +59,8 @@ public:
    }
 };
 
-class ConfigReader {
+class ConfigReader
+{
 private:
    /* Hide the C-tor */
    ConfigReader()
@@ -66,29 +69,30 @@ private:
    static std::shared_ptr<Config> m_configPtr;
    static Config m_configObj;
    static std::mutex m_mutex;
+
 public:
    /* Meyer's singleton */
-   static ConfigReader& getInstance()
+   static ConfigReader &getInstance()
    {
       static ConfigReader obj;
       return obj;
    }
 
-   static void update(const std::string& str, uint32_t& num)
+   static void update(const std::string &str, uint32_t &num)
    {
-      m_mutex.lock();
+      //m_mutex.lock();
       m_configObj = *std::atomic_load(&m_configPtr);
       std::shared_ptr<Config> temp = std::make_shared<Config>(std::ref(m_configObj));
       temp->update(str, num);
-      
+
       std::atomic_exchange(&m_configPtr, temp);
-      m_mutex.unlock();
+      //m_mutex.unlock();
    }
 
    static read_result read()
    {
-      auto tmp = std::atomic_load(&m_configPtr);   // Create a copy of the pointer which internally increments the use count
-      return tmp->read();                                                  // Read from this copy. The copy ensures that underlying raw pointer isn't freed
+      auto tmp = std::atomic_load(&m_configPtr); // Create a copy of the pointer which internally increments the use count
+      return tmp->read();                        // Read from this copy. The copy ensures that underlying raw pointer isn't freed
    }
 };
 
@@ -124,8 +128,8 @@ void writer()
 }
 
 // Initialization of static members
-std::shared_ptr<Config> ConfigReader::m_configPtr{ new Config("0",0) };
-Config ConfigReader::m_configObj("0",0);
+std::shared_ptr<Config> ConfigReader::m_configPtr{new Config("0", 0)};
+Config ConfigReader::m_configObj("0", 0);
 std::mutex ConfigReader::m_mutex;
 
 int main()
@@ -141,11 +145,11 @@ int main()
       writers.emplace_back(writer);
    }
 
-   for (auto& idx : readers)
+   for (auto &idx : readers)
    {
       idx.join();
    }
-   for (auto& idx : writers)
+   for (auto &idx : writers)
    {
       idx.join();
    }
