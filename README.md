@@ -2,6 +2,11 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+![Build](https://github.com/saai63/Lockfree_Reader_Writer/workflows/Linux_Build/badge.svg)
+
+![Build](https://github.com/saai63/Lockfree_Reader_Writer/workflows/Windows_Build/badge.svg)
+
+
 ## Requirements
 * Provide read and write interfaces to an underlying data structure.
 * Access should be thread safe.
