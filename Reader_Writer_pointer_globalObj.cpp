@@ -80,13 +80,13 @@ public:
 
    static void update(const std::string &str, uint32_t &num)
    {
-      //m_mutex.lock();
+      m_mutex.lock();
       m_configObj = *std::atomic_load(&m_configPtr);
       std::shared_ptr<Config> temp = std::make_shared<Config>(std::ref(m_configObj));
       temp->update(str, num);
 
       std::atomic_exchange(&m_configPtr, temp);
-      //m_mutex.unlock();
+      m_mutex.unlock();
    }
 
    static read_result read()
